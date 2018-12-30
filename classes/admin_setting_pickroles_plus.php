@@ -31,6 +31,8 @@ use dml_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/adminlib.php');
+
 /**
  * Class admin_setting_pickroles_plus
  * @package   local_pickroles
@@ -39,6 +41,22 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_pickroles_plus extends admin_setting_pickroles {
+
+    /**
+     * @param  string $name
+     * @param  string $plugin
+     * @param  string $rolefield
+     * @return array
+     */
+    public static function getsqljoins($name, $plugin, $rolefield) {
+        $sql = sprintf(
+            ' JOIN {%s} mlc ON mlc.plugin = :pplugin AND mlc.setting = :psetting AND %s = mlc.roleid ',
+            plugin::COMPONENT,
+            $rolefield
+        );
+        $params = ['pplugin' => $plugin, 'psetting' => $name];
+        return [$sql, $params];
+    }
 
     /**
      * @param  string $name
