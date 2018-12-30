@@ -1,0 +1,34 @@
+image: moodlehq/moodle-php-apache:7.0
+
+services:
+- mysql:5.7
+
+cache:
+  paths:
+  - $HOME/.composer/cache
+  - $HOME/.npm
+
+variables:
+  DEBIAN_FRONTEND: "noninteractive"
+  MOODLE_BRANCH: "MOODLE_33_STABLE"
+  DB: "mysqli"
+  MYSQL_ROOT_PASSWORD: "superrootpass"
+  TRAVIS_BUILD_DIR: "$CI_PROJECT_DIR"
+
+before_script:
+- curl -sL https://deb.nodesource.com/setup_8.x | bash -
+- apt-get -yq install git-core mysql-client
+- apt-get -yq install nodejs
+- cd $CI_PROJECT_DIR/..
+- curl -sS https://getcomposer.org/installer | php
+- mv composer.phar /usr/local/bin/composer
+- composer create-project -n --no-dev --no-progress --prefer-dist blackboard-open-source/moodle-plugin-ci ci 2.4.0
+- export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+- chmod u+x ci/bin/moodle-plugin-ci
+- chmod u+x ci/bin/*
+- umask u+x
+- moodle-plugin-ci install -n --no-init --db-user=root --db-pass=superrootpass --db-host=mysql -vvv
+
+job1:
+  script:
+  - moodle-plugin-ci phplint ; moodle-plugin-ci phpcpd ; moodle-plugin-ci phpmd ; moodle-plugin-ci codechecker ; moodle-plugin-ci mustache ; moodle-plugin-ci validate

@@ -1,0 +1,38 @@
+image: moodlehq/moodle-php-apache:7.0
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - composer
+          - node
+        script:
+          - export DEBIAN_FRONTEND=noninteractive
+          - apt-get -q update
+          - mkdir -p /usr/share/man/man1
+          - apt-get -yq install gnupg2 openjdk-8-jre-headless
+          - curl -sL https://deb.nodesource.com/setup_8.x | bash -
+          - apt-get -yq install git-core mysql-client mysql-server
+          - service mysql start
+          - mysqladmin -u root password test
+          - apt-get -yq install nodejs
+          - cd ..
+          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          - composer create-project -n --no-dev --no-progress --prefer-dist blackboard-open-source/moodle-plugin-ci ci 2.4.0
+          - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+          - chmod u+x ci/bin/moodle-plugin-ci
+          - chmod u+x ci/bin/*
+          - umask u+x
+          - export MOODLE_REPO=https://bitbucket.org/moodle/moodle.git
+          - export MOODLE_BRANCH=MOODLE_33_STABLE
+          - export DB=mysqli
+          - moodle-plugin-ci install -n --moodle="$BITBUCKET_CLONE_DIR/../moodle" --plugin=$BITBUCKET_CLONE_DIR --db-user=root --db-pass=test
+          - moodle-plugin-ci phplint
+          - moodle-plugin-ci phpcpd
+          - moodle-plugin-ci phpmd
+          - moodle-plugin-ci codechecker
+          - moodle-plugin-ci mustache
+          - moodle-plugin-ci validate
+          - moodle-plugin-ci grunt
+          - moodle-plugin-ci phpunit
+          - moodle-plugin-ci behat
