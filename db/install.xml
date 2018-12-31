@@ -15,7 +15,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="searchvalue" UNIQUE="false" FIELDS="plugin,setting"/>
+        <INDEX NAME="searchvalue" UNIQUE="false" FIELDS="plugin,setting,roleid"/>
         <INDEX NAME="roleid" UNIQUE="false" FIELDS="roleid"/>
       </INDEXES>
     </TABLE>
