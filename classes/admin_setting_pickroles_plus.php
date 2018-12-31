@@ -49,12 +49,16 @@ class admin_setting_pickroles_plus extends admin_setting_pickroles {
      * @return array
      */
     public static function getsqljoins($name, $plugin, $rolefield) {
+        $pluginparam = uniqid('pplugin');
+        $settingparam = uniqid('psetting');
         $sql = sprintf(
-            ' JOIN {%s} mlc ON mlc.plugin = :pplugin AND mlc.setting = :psetting AND %s = mlc.roleid ',
+            'JOIN {%s} mlc ON mlc.plugin = :%s AND mlc.setting = :%s AND %s = mlc.roleid',
             plugin::COMPONENT,
+            $pluginparam,
+            $settingparam,
             $rolefield
         );
-        $params = ['pplugin' => $plugin, 'psetting' => $name];
+        $params = [$pluginparam => $plugin, $settingparam => $name];
         return [$sql, $params];
     }
 
