@@ -23,10 +23,13 @@ pipelines:
           - chmod u+x ci/bin/moodle-plugin-ci
           - chmod u+x ci/bin/*
           - umask u+x
-          - export MOODLE_REPO=https://bitbucket.org/moodle/moodle.git
-          - export MOODLE_BRANCH=MOODLE_33_STABLE
-          - export DB=mysqli
-          - moodle-plugin-ci install -n --moodle="$BITBUCKET_CLONE_DIR/../moodle" --plugin=$BITBUCKET_CLONE_DIR --db-user=root --db-pass=test
+          - export MOODLE_REPO='https://bitbucket.org/moodle/moodle.git'
+          - export MOODLE_BRANCH='MOODLE_33_STABLE'
+          - export DB='mysqli'
+          - export TRAVIS_BUILD_DIR="$BITBUCKET_CLONE_DIR"
+          #- export PLUGIN_DIR="$BITBUCKET_CLONE_DIR"
+          #- export MOODLE_DIR="$BITBUCKET_CLONE_DIR/../moodle"
+          - moodle-plugin-ci install -n --db-user=root --db-pass=test
           - moodle-plugin-ci phplint
           - moodle-plugin-ci phpcpd
           - moodle-plugin-ci phpmd
