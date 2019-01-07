@@ -7,26 +7,26 @@ pipelines:
           - composer
           - node
         script:
-          - export DEBIAN_FRONTEND=noninteractive
+          - export DEBIAN_FRONTEND='noninteractive'
+          - export COMPOSER_ALLOW_SUPERUSER=1
+          - export MOODLE_REPO='https://bitbucket.org/moodle/moodle.git'
+          - export MOODLE_BRANCH='MOODLE_33_STABLE'
+          - export DB='mysqli'
+          - export TRAVIS_BUILD_DIR="$BITBUCKET_CLONE_DIR"
           - apt-get -q update
-          - mkdir -p /usr/share/man/man1
-          - apt-get -yq install gnupg2 openjdk-8-jre-headless
+          - apt-get -yq install curl gnupg2 ca-certificates
           - curl -sL https://deb.nodesource.com/setup_8.x | bash -
-          - apt-get -yq install git-core mysql-client mysql-server
+          - mkdir -p /usr/share/man/man1
+          - apt-get -yq install openjdk-8-jre-headless git-core mysql-client mysql-server nodejs
           - service mysql start
           - mysqladmin -u root password test
-          - apt-get -yq install nodejs
           - cd ..
-          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          - curl -sS https://getcomposer.org/installer | php -- --install-dir='/usr/local/bin' --filename='composer'
           - composer create-project -n --no-dev --no-progress --prefer-dist blackboard-open-source/moodle-plugin-ci ci 2.4.0
           - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
           - chmod u+x ci/bin/moodle-plugin-ci
           - chmod u+x ci/bin/*
           - umask u+x
-          - export MOODLE_REPO='https://bitbucket.org/moodle/moodle.git'
-          - export MOODLE_BRANCH='MOODLE_33_STABLE'
-          - export DB='mysqli'
-          - export TRAVIS_BUILD_DIR="$BITBUCKET_CLONE_DIR"
           - moodle-plugin-ci install -n --db-user=root --db-pass=test
           - moodle-plugin-ci phplint
           - moodle-plugin-ci phpcpd
@@ -36,4 +36,5 @@ pipelines:
           - moodle-plugin-ci validate
           - moodle-plugin-ci grunt
           - moodle-plugin-ci phpunit
+          - moodle-plugin-ci behat
           - moodle-plugin-ci behat
