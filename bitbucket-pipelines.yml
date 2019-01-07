@@ -27,8 +27,6 @@ pipelines:
           - export MOODLE_BRANCH='MOODLE_33_STABLE'
           - export DB='mysqli'
           - export TRAVIS_BUILD_DIR="$BITBUCKET_CLONE_DIR"
-          #- export PLUGIN_DIR="$BITBUCKET_CLONE_DIR"
-          #- export MOODLE_DIR="$BITBUCKET_CLONE_DIR/../moodle"
           - moodle-plugin-ci install -n --db-user=root --db-pass=test
           - moodle-plugin-ci phplint
           - moodle-plugin-ci phpcpd
